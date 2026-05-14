@@ -40,6 +40,7 @@ foreach(op_path ${AICORE_OPS})
     target_compile_options(${op_name} PRIVATE
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
     )
+    target_link_options(${op_name} PRIVATE -lm)
 endforeach()
 
 # ==================================================================

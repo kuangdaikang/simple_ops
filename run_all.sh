@@ -4,8 +4,12 @@
 #   4 Vector | 3 Cube | 3 Fusion | 3 CPU
 #
 # 用法:
-#   bash run_all.sh              # 普通运行 + 计时
-#   bash run_all.sh profile      # msprof trace
+#   bash run_all.sh                    # 普通运行 (默认卡0)
+#   bash run_all.sh profile            # msprof trace
+#   bash run_all.sh --device 1         # 指定用卡1运行
+#   bash run_all.sh profile --device 1 # 卡1 + profiling
+#
+# 多卡环境: 通过 ASCEND_RT_VISIBLE_DEVICES 隔离, 确保只用一张卡
 # ============================================================================
 set -e
 
@@ -15,30 +19,39 @@ DATA_DIR="${SCRIPT_DIR}/data"
 PROF_DIR="${SCRIPT_DIR}/profiling"
 RESULTS_FILE="${SCRIPT_DIR}/perf_results.txt"
 
-# 13个算子: bin_name:dir_name:description:type
-OPS=(
-    "op_add:01_vector_add:VectorAdd C=A+B:Vector"
-    "op_relu:02_vector_relu:ReLU B=max(0,A):Vector"
-    "op_sigmoid:03_vector_sigmoid:Sigmoid B=1/(1+e^-A):Vector"
-    "op_abs:04_vector_abs:Abs B=|A|:Vector"
-    "op_matmul:05_cube_matmul:MatMul 64x64x64:Cube"
-    "op_matmul_bias:06_cube_matmul_bias:MatMulTransB 64x64x64:Cube"
-    "op_matmul_large:07_cube_matmul_large:MatMul 128x128x128(tiled):Cube"
-    "op_matmul_relu:08_fusion_matmul_relu:MatMul+ReLU:Fusion"
-    "op_matmul_bias_relu:09_fusion_matmul_bias_relu:MatMul+Bias+ReLU:Fusion"
-    "op_matmul_add:10_fusion_matmul_add:MatMul+ResidualAdd:Fusion"
-    "op_topk:11_cpu_topk:Top-K (CPU):CPU"
-    "op_sort:12_cpu_sort:Sort (CPU):CPU"
-    "op_nms:13_cpu_nms:NMS IoU=0.5 (CPU):CPU"
-)
+# 解析参数: device 默认为 0
+DEVICE_ID=0
+MODE="run"
+for arg in "$@"; do
+    case "$arg" in
+        --device) DEVICE_ID=""; next_is_device=1 ;;
+        --device=*) DEVICE_ID="${arg#*=}" ;;
+        profile) MODE="profile" ;;
+        *) 
+            if [ "$next_is_device" = "1" ]; then
+                DEVICE_ID="$arg"
+                next_is_device=0
+            fi
+            ;;
+    esac
+done
 
-MODE="${1:-run}"
+# 隔离多卡: 只让 ACL 看到指定的一张卡
+export ASCEND_RT_VISIBLE_DEVICES="${DEVICE_ID}"
 
 echo "============================================"
 echo "  Ascend Simple Ops - Run All (13 ops)"
-echo "  Mode: ${MODE}"
-echo "  Time: $(date)"
+echo "  Device: ${DEVICE_ID} (ASCEND_RT_VISIBLE_DEVICES=${ASCEND_RT_VISIBLE_DEVICES})"
+echo "  Mode:   ${MODE}"
+echo "  Time:   $(date)"
 echo "============================================"
+
+# 显示卡信息
+if command -v npu-smi &>/dev/null; then
+    echo ""
+    npu-smi info -t phyID -i "${DEVICE_ID}" 2>/dev/null | head -10 || true
+    echo ""
+fi
 
 # 检查数据文件
 if [ ! -f "${DATA_DIR}/input_a.bin" ]; then

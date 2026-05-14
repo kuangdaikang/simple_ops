@@ -54,4 +54,27 @@ bash run_all.sh
 
 # 4. msprof trace (仅 AI Core 算子)
 bash run_all.sh profile
+
+# 5. 多卡集群: 指定卡运行 (ASCEND_RT_VISIBLE_DEVICES 隔离)
+bash run_all.sh --device 0            # 只用卡0 (默认)
+bash run_all.sh --device 1            # 只用卡1
+bash run_all.sh profile --device 1    # 卡1 + profiling
 ```
+
+## 多卡集群说明
+
+所有算子的 `main()` 中硬编码 `aclrtSetDevice(0)` 固定使用设备0。
+`run_all.sh` 在启动时设置 `ASCEND_RT_VISIBLE_DEVICES` 隔离其他卡。
+
+```bash
+# 查看可用卡
+npu-smi info
+
+# 指定卡运行 (内部设置 ASCEND_RT_VISIBLE_DEVICES=$DEVICE_ID)
+bash run_all.sh --device 1
+
+# 手动隔离 (等效)
+ASCEND_RT_VISIBLE_DEVICES=1 bash run_all.sh
+```
+
+每个算子独立运行，不会占用多张卡。

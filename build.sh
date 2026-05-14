@@ -1,10 +1,10 @@
 #!/bin/bash
 # ============================================================================
-# build.sh - 编译所有10个简单昇腾算子
+# build.sh - 编译全部13个算子 (4 Vector | 3 Cube | 3 Fusion | 3 CPU)
 #
 # 用法:
-#   bash build.sh              # 编译
-#   bash build.sh clean        # 清理后重新编译
+#   bash build.sh                    # 编译
+#   bash build.sh clean              # 清理后重新编译
 #   ASC_ARCH=dav-3510 bash build.sh  # 指定架构
 # ============================================================================
 
@@ -15,21 +15,28 @@ BUILD_DIR="${SCRIPT_DIR}/build"
 ASC_ARCH="${ASC_ARCH:-dav-2201}"
 
 echo "============================================"
-echo "  Ascend Simple Ops Build"
+echo "  Ascend Simple Ops Build (13 operators)"
 echo "  Architecture: ${ASC_ARCH}"
 echo "  Build Dir:    ${BUILD_DIR}"
 echo "============================================"
 
-# 检查环境
+# 检查环境: 探测 CANN toolkit 路径
 if [ -z "${ASCEND_TOOLKIT_HOME}" ] && [ -z "${ASCEND_HOME}" ]; then
     echo "[WARN] ASCEND_TOOLKIT_HOME or ASCEND_HOME not set."
-    echo "       Trying default paths..."
-    if [ -d "/usr/local/Ascend/latest" ]; then
-        export ASCEND_TOOLKIT_HOME="/usr/local/Ascend/latest"
-        echo "[INFO] Found /usr/local/Ascend/latest"
-    elif [ -d "$HOME/Ascend/ascend-toolkit/latest" ]; then
-        export ASCEND_TOOLKIT_HOME="$HOME/Ascend/ascend-toolkit/latest"
-        echo "[INFO] Found $HOME/Ascend/ascend-toolkit/latest"
+    for candidate in \
+        "/usr/local/Ascend/ascend-toolkit/latest" \
+        "/usr/local/Ascend/latest" \
+        "$HOME/Ascend/ascend-toolkit/latest"; do
+        if [ -f "${candidate}/set_env.sh" ]; then
+            echo "[INFO] Found ${candidate}/set_env.sh, sourcing..."
+            source "${candidate}/set_env.sh"
+            break
+        fi
+    done
+    if [ -z "${ASCEND_TOOLKIT_HOME}" ] && [ -z "${ASCEND_HOME}" ]; then
+        echo "[ERROR] Cannot find CANN toolkit. Please source set_env.sh manually."
+        echo "        e.g.: source /usr/local/Ascend/ascend-toolkit/latest/set_env.sh"
+        exit 1
     fi
 fi
 

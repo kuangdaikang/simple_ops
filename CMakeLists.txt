@@ -55,11 +55,6 @@ set(CPU_OPS
 foreach(op_path ${CPU_OPS})
     get_filename_component(op_name ${op_path} NAME)
     add_executable(${op_name} ${op_path}.cpp)
-    target_include_directories(${op_name} PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/include
-        ${ASCEND_CANN_PACKAGE_PATH}/include/acl
-    )
-    target_link_libraries(${op_name} PRIVATE ascendcl acl_op_compiler)
 endforeach()
 
 message(STATUS "CMAKE_ASC_ARCHITECTURES = ${CMAKE_ASC_ARCHITECTURES}")

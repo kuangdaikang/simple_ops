@@ -39,7 +39,8 @@ CPU:           ACL memcpy → Host std::sort/partial_sort/IoU
 ## 快速开始
 
 ```bash
-source /usr/local/Ascend/latest/set_env.sh
+source /usr/local/Ascend/ascend-toolkit/set_env.sh
+export ASC_DIR=/usr/local/Ascend/ascend-toolkit/8.3.RC2/aarch64-linux/tikcpp/ascendc_kernel_cmake
 cd simple_ops
 
 # 1. 生成数据 (~1MB vector, ~64KB matmul)

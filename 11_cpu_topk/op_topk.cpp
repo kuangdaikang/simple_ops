@@ -25,11 +25,11 @@ int main()
     aclrtCreateStream(&stream);
 
     float *hostIn, *hostVal, *hostIdx;
-    void *devBuf;
+    uint8_t *devBuf = nullptr;
     aclrtMallocHost((void**)&hostIn, byteSize);
     aclrtMallocHost((void**)&hostVal, K * sizeof(float));
     aclrtMallocHost((void**)&hostIdx, K * sizeof(float));
-    aclrtMalloc(&devBuf, byteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc((void**)&devBuf, byteSize, ACL_MEM_MALLOC_HUGE_FIRST);
 
     size_t fs;
     ReadFile("../data/input_a.bin", fs, hostIn, byteSize);

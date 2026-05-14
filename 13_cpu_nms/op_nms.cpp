@@ -40,9 +40,9 @@ int main()
     aclrtCreateStream(&stream);
 
     float *hostBoxes;
-    void *devBuf;
+    uint8_t *devBuf = nullptr;
     aclrtMallocHost((void**)&hostBoxes, boxSize);
-    aclrtMalloc(&devBuf, boxSize, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc((void**)&devBuf, boxSize, ACL_MEM_MALLOC_HUGE_FIRST);
 
     size_t fs;
     ReadFile("../data/input_a.bin", fs, hostBoxes, boxSize);

@@ -6,7 +6,7 @@
 |------|------|------|----------|
 | **Vector-Only** | 4 | 纯向量单元 MTE2/V/MTE3 | `__global__ __vector__` |
 | **Cube-Only** | 3 | 纯矩阵单元 Cube+Mmad | `__global__ __cube__` |
-| **Fusion (Cube+Vector)** | 3 | Cube矩阵乘 + Vector后处理 | `__global__ __cube_vec__` |
+| **Fusion (Cube+Vector)** | 3 | Cube矩阵乘 + Vector后处理 | `__global__ __mix__(1, 2)` |
 | **CPU** | 3 | Host CPU (不规则计算) | C++ host |
 
 ## 13 个算子一览

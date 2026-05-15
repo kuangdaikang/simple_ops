@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <sys/time.h>
+#include <cstdint>   // 提供 uint32_t 等固定宽度整数类型
 struct Box{float x1,y1,x2,y2,score;uint32_t idx;};
 static float IoU(const Box&a,const Box&b){float ix1=std::max(a.x1,b.x1),iy1=std::max(a.y1,b.y1),ix2=std::min(a.x2,b.x2),iy2=std::min(a.y2,b.y2);float iw=std::max(0.f,ix2-ix1),ih=std::max(0.f,iy2-iy1);float inter=iw*ih,areaA=(a.x2-a.x1)*(a.y2-a.y1),areaB=(b.x2-b.x1)*(b.y2-b.y1);return inter/(areaA+areaB-inter+1e-8f);}
 static double NowUs(){struct timeval tv;gettimeofday(&tv,0);return tv.tv_sec*1e6+tv.tv_usec;}

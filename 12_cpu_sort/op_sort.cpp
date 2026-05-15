@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sys/time.h>
+#include <cstdint>   // 提供 uint32_t 等固定宽度整数类型
 static double NowUs() { struct timeval tv; gettimeofday(&tv,0); return tv.tv_sec*1e6+tv.tv_usec; }
 int main() {
     constexpr uint32_t N=4096*9;

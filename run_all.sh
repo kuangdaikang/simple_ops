@@ -19,6 +19,22 @@ DATA_DIR="${SCRIPT_DIR}/data"
 PROF_DIR="${SCRIPT_DIR}/profiling"
 RESULTS_FILE="${SCRIPT_DIR}/perf_results.txt"
 
+OPS=(
+    "op_add:01_vector_add:Vector Add:Vector"
+    "op_relu:02_vector_relu:Vector ReLU:Vector"
+    "op_sigmoid:03_vector_sigmoid:Vector Sigmoid:Vector"
+    "op_abs:04_vector_abs:Vector Abs:Vector"
+    "op_matmul:05_cube_matmul:MatMul:Cube"
+    "op_matmul_bias:06_cube_matmul_bias:MatMul+Bias:Cube"
+    "op_matmul_large:07_cube_matmul_large:MatMul Large:Cube"
+    "op_matmul_relu:08_fusion_matmul_relu:MatMul+ReLU:Fusion"
+    "op_matmul_bias_relu:09_fusion_matmul_bias_relu:MatMul+Bias+ReLU:Fusion"
+    "op_matmul_add:10_fusion_matmul_add:MatMul+Add:Fusion"
+    "op_topk:11_cpu_topk:TopK:CPU"
+    "op_sort:12_cpu_sort:Sort:CPU"
+    "op_nms:13_cpu_nms:NMS:CPU"
+)
+
 # 解析参数: device 默认为 0
 DEVICE_ID=0
 MODE="run"
@@ -49,7 +65,7 @@ echo "============================================"
 # 显示卡信息
 if command -v npu-smi &>/dev/null; then
     echo ""
-    npu-smi info -t phyID -i "${DEVICE_ID}" 2>/dev/null | head -10 || true
+    npu-smi info -t board -i "${DEVICE_ID}" 2>/dev/null | head -10 || true
     echo ""
 fi
 
